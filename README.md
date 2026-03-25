@@ -11,11 +11,6 @@ O UrbanStore** é uma loja virtual completa, construída com Django e Django RES
 
 ---
 
-## ✅ Requisitos Atendidos
-
-
----
-
 ## 🚀 Como Executar no VS Code
 
 ### Pré-requisitos
