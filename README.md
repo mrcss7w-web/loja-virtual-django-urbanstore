@@ -7,7 +7,7 @@
 
 ## 📋 Sobre o Projeto
 
-O UrbanStore** é uma loja virtual completa, construída com Django e Django REST Framework. Oferece:
+O UrbanStore é uma loja virtual completa, construída com Django e Django REST Framework. Oferece:
 
 ---
 
