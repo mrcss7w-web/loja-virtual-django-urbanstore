@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "ms-python.python",
+    "ms-python.pylance",
+    "batisteo.vscode-django",
+    "ms-python.black-formatter",
+    "EditorConfig.EditorConfig"
+  ]
+}

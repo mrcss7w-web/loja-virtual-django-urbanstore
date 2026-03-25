@@ -1,0 +1,95 @@
+{% extends 'core/base.html' %}
+{% block title %}Produtos — Admin UrbanStore{% endblock %}
+
+{% block content %}
+<section class="admin-section">
+  <div class="section-inner">
+
+    <div class="admin-topbar">
+      <div>
+        <h1 class="admin-title">PRODUTOS</h1>
+        <p class="admin-sub">{{ produtos|length }} produto{{ produtos|length|pluralize:"s" }} no sistema</p>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a href="{% url 'produtos:admin_dashboard' %}" class="btn-ghost">← Dashboard</a>
+        <a href="{% url 'produtos:criar' %}" class="btn-primary">+ Novo Produto</a>
+      </div>
+    </div>
+
+    <form method="get" class="search-bar">
+      <input type="text" name="busca" value="{{ busca }}" class="form-input" placeholder="Buscar por nome ou categoria...">
+      <button type="submit" class="btn-primary">Buscar</button>
+      {% if busca %}<a href="{% url 'produtos:admin_lista' %}" class="btn-ghost">✕ Limpar</a>{% endif %}
+    </form>
+
+    {% if produtos %}
+    <div class="table-card">
+      <div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Imagem</th>
+              <th>Nome</th>
+              <th>Categoria</th>
+              <th>Preço</th>
+              <th>Estoque</th>
+              <th>Status</th>
+              <th>Destaque</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in produtos %}
+            <tr class="{% if not p.ativo %}row-inactive{% endif %}">
+              <td class="td-id">{{ forloop.counter }}</td>
+              <td class="td-thumb">
+                {% if p.imagem_url %}
+                <img src="{{ p.imagem_url }}" alt="{{ p.nome }}" onerror="this.style.display='none'">
+                {% else %}
+                <div class="thumb-placeholder">{{ p.nome|slice:":2"|upper }}</div>
+                {% endif %}
+              </td>
+              <td><strong>{{ p.nome }}</strong></td>
+              <td>{{ p.categoria.nome|default:"—" }}</td>
+              <td>
+                {% if p.tem_promocao %}
+                <span class="price-new">R$ {{ p.preco_promocional }}</span><br>
+                <span style="font-size:12px;color:var(--text-muted);text-decoration:line-through">R$ {{ p.preco }}</span>
+                {% else %}
+                R$ {{ p.preco }}
+                {% endif %}
+              </td>
+              <td class="{% if p.estoque == 0 %}td-zero{% endif %}">{{ p.estoque }}</td>
+              <td>
+                {% if p.ativo %}<span class="badge-ok">Ativo</span>
+                {% else %}<span class="badge-off">Inativo</span>{% endif %}
+              </td>
+              <td>{% if p.destaque %}<span class="badge-dest">★</span>{% else %}—{% endif %}</td>
+              <td class="td-acoes">
+                <a href="{% url 'produtos:detalhe' p.pk %}" class="btn-sm-view" target="_blank">Ver</a>
+                <a href="{% url 'produtos:editar' p.pk %}" class="btn-sm-edit">Editar</a>
+                <a href="{% url 'produtos:excluir' p.pk %}" class="btn-sm-del">Excluir</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% else %}
+    <div class="empty-admin">
+      <div class="empty-icon">📦</div>
+      <h3>Nenhum produto encontrado</h3>
+      {% if busca %}
+      <p>Nenhum resultado para "{{ busca }}".</p>
+      <a href="{% url 'produtos:admin_lista' %}" class="btn-primary" style="margin-top:16px">Ver todos</a>
+      {% else %}
+      <a href="{% url 'produtos:criar' %}" class="btn-primary" style="margin-top:16px">Cadastrar primeiro produto</a>
+      {% endif %}
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

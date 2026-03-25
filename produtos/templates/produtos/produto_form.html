@@ -1,0 +1,151 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ titulo }} — Admin{% endblock %}
+
+{% block content %}
+<section class="admin-section">
+    <div class="section-inner form-section">
+        <div class="admin-topbar">
+            <h1 class="admin-title">{{ titulo|upper }}</h1>
+        </div>
+
+        <form method="post" class="produto-form" id="produtoForm">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="form-errors">
+                {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="form-grid-2">
+                <!-- Nome -->
+                <div class="form-group full-width">
+                    <label>{{ form.nome.label }}</label>
+                    {{ form.nome }}
+                    {% if form.nome.errors %}
+                    <p class="field-error">{{ form.nome.errors|join:", " }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Descrição -->
+                <div class="form-group full-width">
+                    <label>{{ form.descricao.label }}</label>
+                    {{ form.descricao }}
+                    {% if form.descricao.errors %}
+                    <p class="field-error">{{ form.descricao.errors|join:", " }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Preço -->
+                <div class="form-group">
+                    <label>{{ form.preco.label }}</label>
+                    {{ form.preco }}
+                    {% if form.preco.errors %}
+                    <p class="field-error">{{ form.preco.errors|join:", " }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Preço Promocional -->
+                <div class="form-group">
+                    <label>{{ form.preco_promocional.label }}</label>
+                    {{ form.preco_promocional }}
+                    {% if form.preco_promocional.errors %}
+                    <p class="field-error">{{ form.preco_promocional.errors|join:", " }}</p>
+                    {% endif %}
+                    <small class="form-hint">Deixe vazio se não houver promoção</small>
+                </div>
+
+                <!-- Estoque -->
+                <div class="form-group">
+                    <label>{{ form.estoque.label }}</label>
+                    {{ form.estoque }}
+                    {% if form.estoque.errors %}
+                    <p class="field-error">{{ form.estoque.errors|join:", " }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Categoria -->
+                <div class="form-group">
+                    <label>{{ form.categoria.label }}</label>
+                    {{ form.categoria }}
+                    {% if form.categoria.errors %}
+                    <p class="field-error">{{ form.categoria.errors|join:", " }}</p>
+                    {% endif %}
+                    <small class="form-hint">
+                        <a href="{% url 'produtos:categoria_criar' %}" target="_blank">+ Criar nova categoria</a>
+                    </small>
+                </div>
+
+                <!-- Imagem URL -->
+                <div class="form-group full-width">
+                    <label>{{ form.imagem_url.label }}</label>
+                    {{ form.imagem_url }}
+                    {% if form.imagem_url.errors %}
+                    <p class="field-error">{{ form.imagem_url.errors|join:", " }}</p>
+                    {% endif %}
+                    <small class="form-hint">Cole a URL completa de uma imagem pública (ex: https://...)</small>
+                </div>
+
+                <!-- Preview Imagem -->
+                <div class="form-group full-width" id="imgPreviewWrap" style="display:none">
+                    <label>Preview da Imagem</label>
+                    <img id="imgPreview" src="" alt="Preview" class="img-preview">
+                </div>
+
+                <!-- Checkboxes -->
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">
+                        {{ form.ativo }} {{ form.ativo.label }}
+                    </label>
+                </div>
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">
+                        {{ form.destaque }} {{ form.destaque.label }}
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">{{ acao }}</button>
+                <a href="{% url 'produtos:admin_lista' %}" class="btn-outline">Cancelar</a>
+                {% if produto %}
+                <a href="{% url 'produtos:excluir' produto.pk %}" class="btn-danger">Excluir Produto</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Preview de imagem ao digitar a URL
+const urlInput = document.querySelector('input[name="imagem_url"]');
+const preview = document.getElementById('imgPreview');
+const previewWrap = document.getElementById('imgPreviewWrap');
+
+if (urlInput) {
+    // Mostra preview se já tem imagem (edição)
+    if (urlInput.value) {
+        preview.src = urlInput.value;
+        previewWrap.style.display = 'block';
+    }
+
+    urlInput.addEventListener('input', function () {
+        const url = this.value.trim();
+        if (url) {
+            preview.src = url;
+            previewWrap.style.display = 'block';
+            preview.onerror = function () {
+                previewWrap.style.display = 'none';
+            };
+        } else {
+            previewWrap.style.display = 'none';
+        }
+    });
+}
+</script>
+{% endblock %}

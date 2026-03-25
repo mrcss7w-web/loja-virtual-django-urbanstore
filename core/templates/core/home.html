@@ -1,0 +1,154 @@
+{% extends 'core/base.html' %}
+{% block title %}UrbanStore — Loja Virtual{% endblock %}
+
+{% block content %}
+
+<!-- ══ HERO ══════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="section-inner hero-inner">
+
+    <div class="hero-content">
+      <span class="hero-eyebrow">✦ Nova Coleção Disponível</span>
+      <h1 class="hero-title">ESTILO<br>SEM<br>LIMITES</h1>
+      <p class="hero-sub">
+        {% if total_produtos %}
+          {{ total_produtos }} produto{{ total_produtos|pluralize:"s" }} esperando por você
+        {% else %}
+          Descubra os melhores produtos com os melhores preços
+        {% endif %}
+      </p>
+      <div class="hero-actions">
+        <a href="{% url 'produtos:catalogo' %}" class="btn-hero">Ver Catálogo →</a>
+        {% if not user.is_authenticated %}
+        <a href="{% url 'core:login' %}" class="btn-ghost">Área Admin</a>
+        {% endif %}
+      </div>
+      <!-- Badges de confiança -->
+      <div class="trust-badges">
+        <span class="trust-badge">🔒 Compra Segura</span>
+        <span class="trust-badge">⚡ API REST</span>
+        <span class="trust-badge">🌗 Dark Mode</span>
+      </div>
+    </div>
+
+    <!-- Grid de cards de destaque -->
+    <div class="hero-cards">
+      {% for p in destaques|slice:":4" %}
+      <a href="{% url 'produtos:detalhe' p.pk %}" class="hero-card {% if forloop.first %}hero-card--big{% endif %}">
+        <div class="hero-card-img">
+          {% if p.imagem_url %}
+          <img src="{{ p.imagem_url }}" alt="{{ p.nome }}"
+               onerror="this.src='https://placehold.co/600x600/6c63ff/ffffff?text={{ p.nome|urlencode }}'">
+          {% else %}
+          <div class="hero-card-placeholder">{{ p.nome|slice:":2"|upper }}</div>
+          {% endif %}
+        </div>
+        {% if p.tem_promocao %}
+        <span class="badge-sale">-{{ p.percentual_desconto }}%</span>
+        {% endif %}
+        {% if p.destaque %}
+        <span class="badge-hot">★ Destaque</span>
+        {% endif %}
+        <div class="hero-card-info">
+          <p class="hero-card-cat">{{ p.categoria.nome|default:"" }}</p>
+          <p class="hero-card-name">{{ p.nome|truncatechars:28 }}</p>
+          <p class="hero-card-price">R$ {{ p.preco_atual }}</p>
+        </div>
+      </a>
+      {% empty %}
+      <div class="hero-empty-state">
+        <div class="hero-empty-icon">🛍️</div>
+        <p>Nenhum produto em destaque ainda.</p>
+        <a href="{% url 'core:login' %}" class="btn-hero" style="display:inline-block;margin-top:16px">Cadastrar Produtos</a>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ CATEGORIAS ════════════════════════════════════════════ -->
+{% if categorias %}
+<section class="section-cats">
+  <div class="section-inner">
+    <div class="section-header">
+      <h2 class="section-title">CATEGORIAS</h2>
+      <a href="{% url 'produtos:catalogo' %}" class="link-all">Ver tudo →</a>
+    </div>
+    <div class="cats-strip">
+      {% for cat in categorias %}
+      <a href="{% url 'produtos:catalogo' %}?categoria={{ cat.pk }}" class="cat-pill">
+        <span class="cat-pill-dot"></span>
+        {{ cat.nome }}
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ══ NOVIDADES ═════════════════════════════════════════════ -->
+<section class="section-produtos">
+  <div class="section-inner">
+    <div class="section-header">
+      <h2 class="section-title">NOVIDADES</h2>
+      <a href="{% url 'produtos:catalogo' %}" class="link-all">Ver todos →</a>
+    </div>
+    <div class="produtos-grid">
+      {% for p in lancamentos %}
+      <a href="{% url 'produtos:detalhe' p.pk %}" class="produto-card">
+        <div class="pc-img">
+          {% if p.imagem_url %}
+          <img src="{{ p.imagem_url }}" alt="{{ p.nome }}"
+               onerror="this.src='https://placehold.co/400x400/6c63ff/ffffff?text={{ p.nome|slice:':2'|upper }}'">
+          {% else %}
+          <div class="pc-no-img">{{ p.nome|slice:":2"|upper }}</div>
+          {% endif %}
+          {% if p.tem_promocao %}<span class="badge-sale pc-badge">-{{ p.percentual_desconto }}%</span>{% endif %}
+          {% if p.estoque == 0 %}<span class="badge-out">Esgotado</span>{% endif %}
+        </div>
+        <div class="pc-info">
+          {% if p.categoria %}<p class="pc-cat">{{ p.categoria.nome }}</p>{% endif %}
+          <p class="pc-name">{{ p.nome }}</p>
+          <div class="pc-prices">
+            {% if p.tem_promocao %}
+            <span class="price-old">R$ {{ p.preco }}</span>
+            <span class="price-new">R$ {{ p.preco_promocional }}</span>
+            {% else %}
+            <span class="price-main">R$ {{ p.preco }}</span>
+            {% endif %}
+          </div>
+          <p class="pc-stock {% if p.estoque == 0 %}out{% endif %}">
+            {% if p.estoque > 0 %}✔ Em estoque{% else %}✗ Esgotado{% endif %}
+          </p>
+        </div>
+      </a>
+      {% empty %}
+      <div class="empty-grid-msg">
+        <p>Nenhum produto cadastrado ainda.</p>
+        <a href="{% url 'core:login' %}" class="btn-primary" style="margin-top:16px">Cadastrar primeiro produto</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ══ API CTA ════════════════════════════════════════════════ -->
+<section class="section-cta">
+  <div class="section-inner">
+    <div class="cta-card">
+      <div class="cta-glow"></div>
+      <div class="cta-body">
+        <div class="cta-icon">⚡</div>
+        <div class="cta-text">
+          <h3>API REST disponível</h3>
+          <p>Acesse produtos e categorias via API com autenticação por Token.</p>
+          <code>GET /api/produtos/ · POST /api/auth/login/</code>
+        </div>
+      </div>
+      <a href="/api/" class="btn-cta" target="_blank">Explorar API →</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

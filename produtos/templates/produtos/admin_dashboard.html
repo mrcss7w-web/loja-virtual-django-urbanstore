@@ -1,0 +1,122 @@
+{% extends 'core/base.html' %}
+{% block title %}Dashboard — UrbanStore Admin{% endblock %}
+
+{% block content %}
+<section class="admin-section">
+  <div class="section-inner">
+
+    <div class="admin-topbar">
+      <div>
+        <h1 class="admin-title">PAINEL ADMIN</h1>
+        <p class="admin-sub">Bem-vindo, <strong>{{ user.first_name|default:user.username }}</strong></p>
+      </div>
+      <a href="{% url 'produtos:criar' %}" class="btn-primary">+ Novo Produto</a>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <span class="stat-num">{{ total_produtos }}</span>
+        <span class="stat-label">Total de Produtos</span>
+      </div>
+      <div class="stat-card stat-ok">
+        <div class="stat-icon">✅</div>
+        <span class="stat-num">{{ produtos_ativos }}</span>
+        <span class="stat-label">Ativos</span>
+      </div>
+      <div class="stat-card stat-accent">
+        <div class="stat-icon">⭐</div>
+        <span class="stat-num">{{ produtos_destaque }}</span>
+        <span class="stat-label">Em Destaque</span>
+      </div>
+      <div class="stat-card {% if sem_estoque > 0 %}stat-warn{% endif %}">
+        <div class="stat-icon">⚠️</div>
+        <span class="stat-num">{{ sem_estoque }}</span>
+        <span class="stat-label">Sem Estoque</span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🗂️</div>
+        <span class="stat-num">{{ total_categorias }}</span>
+        <span class="stat-label">Categorias</span>
+      </div>
+    </div>
+
+    <!-- Atalhos -->
+    <div class="atalhos-grid">
+      <a href="{% url 'produtos:admin_lista' %}" class="atalho-card">
+        <span class="atalho-icon">📋</span>
+        <span class="atalho-label">Gerenciar Produtos</span>
+      </a>
+      <a href="{% url 'produtos:criar' %}" class="atalho-card">
+        <span class="atalho-icon">➕</span>
+        <span class="atalho-label">Novo Produto</span>
+      </a>
+      <a href="{% url 'produtos:categoria_lista' %}" class="atalho-card">
+        <span class="atalho-icon">🗂️</span>
+        <span class="atalho-label">Categorias</span>
+      </a>
+      <a href="{% url 'produtos:catalogo' %}" class="atalho-card" target="_blank">
+        <span class="atalho-icon">🛍️</span>
+        <span class="atalho-label">Ver Loja</span>
+      </a>
+      <a href="/api/" class="atalho-card" target="_blank">
+        <span class="atalho-icon">⚡</span>
+        <span class="atalho-label">API REST</span>
+      </a>
+      <a href="/django-admin/" class="atalho-card" target="_blank">
+        <span class="atalho-icon">🔧</span>
+        <span class="atalho-label">Django Admin</span>
+      </a>
+    </div>
+
+    <!-- Tabela últimos produtos -->
+    <div class="table-card">
+      <div class="table-card-header">
+        <h3>Últimos Cadastros</h3>
+        <a href="{% url 'produtos:admin_lista' %}" class="link-all">Ver todos →</a>
+      </div>
+      <div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Categoria</th>
+              <th>Preço</th>
+              <th>Estoque</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in ultimos_produtos %}
+            <tr class="{% if not p.ativo %}row-inactive{% endif %}">
+              <td><strong>{{ p.nome }}</strong></td>
+              <td>{{ p.categoria.nome|default:"—" }}</td>
+              <td>
+                {% if p.tem_promocao %}
+                <span class="price-new">R$ {{ p.preco_promocional }}</span>
+                {% else %}
+                R$ {{ p.preco }}
+                {% endif %}
+              </td>
+              <td class="{% if p.estoque == 0 %}td-zero{% endif %}">{{ p.estoque }}</td>
+              <td>
+                {% if p.ativo %}<span class="badge-ok">Ativo</span>
+                {% else %}<span class="badge-off">Inativo</span>{% endif %}
+              </td>
+              <td class="td-acoes">
+                <a href="{% url 'produtos:detalhe' p.pk %}" class="btn-sm-view" target="_blank">Ver</a>
+                <a href="{% url 'produtos:editar' p.pk %}" class="btn-sm-edit">Editar</a>
+                <a href="{% url 'produtos:excluir' p.pk %}" class="btn-sm-del">Excluir</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

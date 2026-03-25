@@ -1,0 +1,20 @@
+{% extends 'core/base.html' %}
+{% block title %}Excluir Categoria{% endblock %}
+{% block content %}
+<section class="admin-section">
+    <div class="section-inner">
+        <div class="confirm-card">
+            <div class="confirm-icon">🗑️</div>
+            <h2 class="confirm-title">Excluir Categoria</h2>
+            <p class="confirm-sub">Tem certeza que deseja excluir a categoria <strong>"{{ categoria.nome }}"</strong>?<br>Os produtos dessa categoria ficarão sem categoria.</p>
+            <div class="confirm-actions">
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-danger">Sim, excluir</button>
+                </form>
+                <a href="{% url 'produtos:categoria_lista' %}" class="btn-outline">Cancelar</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

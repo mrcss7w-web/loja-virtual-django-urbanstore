@@ -1,0 +1,81 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}UrbanStore{% endblock %}</title>
+    <meta name="description" content="UrbanStore — Loja Virtual com estilo e qualidade.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+    <!-- Aplica tema antes do render para evitar flash -->
+    <script>
+        (function(){
+            var t = localStorage.getItem('urbanstore-theme') ||
+                    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-inner">
+        <a href="{% url 'core:home' %}" class="nav-brand">
+            <span class="brand-mark">U</span>
+            <span class="brand-name">RBAN<span class="brand-accent">STORE</span></span>
+        </a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="{% url 'core:home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a></li>
+            <li><a href="{% url 'produtos:catalogo' %}" class="nav-link {% if request.resolver_match.url_name == 'catalogo' %}active{% endif %}">Catálogo</a></li>
+            {% if user.is_authenticated %}
+            <li><a href="{% url 'produtos:admin_dashboard' %}" class="nav-link nav-admin {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">⚙ Painel</a></li>
+            <li>
+                <form method="post" action="{% url 'core:logout' %}" style="display:inline">
+                    {% csrf_token %}
+                    <button type="submit" class="nav-link nav-logout">Sair ({{ user.username }})</button>
+                </form>
+            </li>
+            {% else %}
+            <li><a href="{% url 'core:login' %}" class="btn-nav-login">Entrar</a></li>
+            {% endif %}
+        </ul>
+        <button class="theme-toggle" id="themeToggle" title="Alternar tema">🌙</button>
+        <button class="nav-toggle" id="navToggle" aria-label="Menu">&#9776;</button>
+    </div>
+</nav>
+
+{% if messages %}
+<div class="messages-wrapper">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        <span>{{ message }}</span>
+        <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<main>{% block content %}{% endblock %}</main>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <span class="brand-mark sm">U</span>
+            <span class="brand-name sm">RBAN<span class="brand-accent">STORE</span></span>
+        </div>
+        <p class="footer-tagline">Desafio Final Django · IFMG Bambuí</p>
+        <div class="footer-links">
+            <a href="{% url 'produtos:catalogo' %}">Catálogo</a>
+            <a href="/api/">API REST</a>
+            <a href="{% url 'core:login' %}">Admin</a>
+        </div>
+    </div>
+</footer>
+
+<script src="{% static 'core/js/script.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

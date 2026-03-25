@@ -1,0 +1,108 @@
+{% extends 'core/base.html' %}
+{% block title %}Catálogo — UrbanStore{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div class="section-inner">
+    <h1 class="page-title">CATÁLOGO</h1>
+    <p class="page-sub">{{ total }} produto{{ total|pluralize:"s" }} encontrado{{ total|pluralize:"s" }}</p>
+  </div>
+</div>
+
+<section class="catalogo-wrap">
+  <div class="section-inner catalogo-layout">
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar-filtros">
+      <form method="get" id="filtroForm">
+        <div class="sidebar-section">
+          <p class="sidebar-label">BUSCA</p>
+          <div class="search-input-wrap">
+            <input type="text" name="busca" value="{{ busca }}"
+                   class="form-input" placeholder="Buscar produtos...">
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <p class="sidebar-label">CATEGORIA</p>
+          <div class="cat-filter-list">
+            <a href="{% url 'produtos:catalogo' %}{% if busca %}?busca={{ busca }}{% endif %}"
+               class="cat-filter-item {% if not categoria_selecionada %}active{% endif %}">
+              Todas as categorias
+            </a>
+            {% for cat in categorias %}
+            <a href="?categoria={{ cat.pk }}{% if busca %}&busca={{ busca }}{% endif %}"
+               class="cat-filter-item {% if categoria_selecionada == cat.pk|stringformat:'s' %}active{% endif %}">
+              {{ cat.nome }}
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <p class="sidebar-label">ORDENAR</p>
+          <select name="ordem" class="form-input" onchange="this.form.submit()">
+            <option value="-criado_em" {% if ordenacao == '-criado_em' %}selected{% endif %}>Mais recentes</option>
+            <option value="preco"      {% if ordenacao == 'preco' %}selected{% endif %}>Menor preço</option>
+            <option value="-preco"     {% if ordenacao == '-preco' %}selected{% endif %}>Maior preço</option>
+            <option value="nome"       {% if ordenacao == 'nome' %}selected{% endif %}>Nome A–Z</option>
+          </select>
+        </div>
+
+        <input type="hidden" name="categoria" value="{{ categoria_selecionada }}">
+        <button type="submit" class="btn-filtrar">Aplicar</button>
+        {% if busca or categoria_selecionada %}
+        <a href="{% url 'produtos:catalogo' %}" class="btn-limpar">✕ Limpar filtros</a>
+        {% endif %}
+      </form>
+    </aside>
+
+    <!-- ── Grid ── -->
+    <div class="catalogo-main">
+      {% if produtos %}
+      <div class="produtos-grid">
+        {% for p in produtos %}
+        <a href="{% url 'produtos:detalhe' p.pk %}" class="produto-card">
+          <div class="pc-img">
+            {% if p.imagem_url %}
+            <img src="{{ p.imagem_url }}" alt="{{ p.nome }}"
+                 onerror="this.src='https://placehold.co/400x400/6c63ff/ffffff?text={{ p.nome|slice:':2'|upper }}'">
+            {% else %}
+            <div class="pc-no-img">{{ p.nome|slice:":2"|upper }}</div>
+            {% endif %}
+            {% if p.tem_promocao %}<span class="badge-sale pc-badge">-{{ p.percentual_desconto }}%</span>{% endif %}
+            {% if p.estoque == 0 %}<span class="badge-out">Esgotado</span>{% endif %}
+            {% if p.destaque %}<span class="badge-dest">★</span>{% endif %}
+          </div>
+          <div class="pc-info">
+            {% if p.categoria %}<p class="pc-cat">{{ p.categoria.nome }}</p>{% endif %}
+            <p class="pc-name">{{ p.nome }}</p>
+            <div class="pc-prices">
+              {% if p.tem_promocao %}
+              <span class="price-old">R$ {{ p.preco }}</span>
+              <span class="price-new">R$ {{ p.preco_promocional }}</span>
+              {% else %}
+              <span class="price-main">R$ {{ p.preco }}</span>
+              {% endif %}
+            </div>
+            <p class="pc-stock {% if p.estoque == 0 %}out{% endif %}">
+              {% if p.estoque > 0 %}✔ {{ p.estoque }} em estoque{% else %}✗ Esgotado{% endif %}
+            </p>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-cat-state">
+        <div class="empty-icon">🔍</div>
+        <h3>Nenhum produto encontrado</h3>
+        <p>Tente outros termos ou remova os filtros.</p>
+        <a href="{% url 'produtos:catalogo' %}" class="btn-primary" style="margin-top:20px">Ver todos os produtos</a>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}

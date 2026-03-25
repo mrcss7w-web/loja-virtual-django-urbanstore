@@ -1,0 +1,43 @@
+{% extends 'core/base.html' %}
+{% block title %}Categorias — Admin{% endblock %}
+{% block content %}
+<section class="admin-section">
+    <div class="section-inner">
+        <div class="admin-topbar">
+            <div>
+                <h1 class="admin-title">CATEGORIAS</h1>
+                <p class="admin-sub">{{ categorias|length }} categoria{{ categorias|length|pluralize:"s" }} cadastrada{{ categorias|length|pluralize:"s" }}</p>
+            </div>
+            <a href="{% url 'produtos:categoria_criar' %}" class="btn-primary">+ Nova Categoria</a>
+        </div>
+        {% if categorias %}
+        <div class="categoria-lista-grid">
+            {% for cat in categorias %}
+            <div class="cat-list-card">
+                <div class="cat-list-info">
+                    <h4>{{ cat.nome }}</h4>
+                    <p>{{ cat.descricao|default:"Sem descrição"|truncatechars:60 }}</p>
+                    <p style="margin-top:4px;color:var(--accent);font-size:12px;font-weight:700;">
+                        {{ cat.produtos.filter_by_active_count|default:"" }}
+                        {{ cat.produtos.count }} produto{{ cat.produtos.count|pluralize:"s" }}
+                    </p>
+                </div>
+                <div class="cat-list-actions">
+                    <a href="{% url 'produtos:categoria_editar' cat.pk %}" class="btn-sm-edit">Editar</a>
+                    <a href="{% url 'produtos:categoria_excluir' cat.pk %}" class="btn-sm-del">Excluir</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state-admin">
+            <p>Nenhuma categoria cadastrada.</p>
+            <a href="{% url 'produtos:categoria_criar' %}" class="btn-primary" style="margin-top:16px">Criar primeira categoria</a>
+        </div>
+        {% endif %}
+        <div class="admin-back">
+            <a href="{% url 'produtos:admin_dashboard' %}" class="btn-outline">← Dashboard</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

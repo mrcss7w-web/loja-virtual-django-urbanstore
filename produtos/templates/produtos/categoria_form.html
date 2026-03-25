@@ -1,0 +1,29 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ titulo }} — Admin{% endblock %}
+{% block content %}
+<section class="admin-section">
+    <div class="section-inner form-section">
+        <div class="admin-topbar"><h1 class="admin-title">{{ titulo|upper }}</h1></div>
+        <form method="post" class="produto-form">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+            <div class="form-errors">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>
+            {% endif %}
+            <div class="form-group" style="margin-bottom:20px">
+                <label>{{ form.nome.label }}</label>
+                {{ form.nome }}
+                {% if form.nome.errors %}<p class="field-error">{{ form.nome.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div class="form-group" style="margin-bottom:28px">
+                <label>{{ form.descricao.label }}</label>
+                {{ form.descricao }}
+                {% if form.descricao.errors %}<p class="field-error">{{ form.descricao.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">{{ acao }}</button>
+                <a href="{% url 'produtos:categoria_lista' %}" class="btn-outline">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ produto.nome }} — UrbanStore{% endblock %}
+
+{% block content %}
+<section class="detalhe-section">
+  <div class="section-inner">
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a href="{% url 'core:home' %}">Home</a>
+      <span>/</span>
+      <a href="{% url 'produtos:catalogo' %}">Catálogo</a>
+      {% if produto.categoria %}
+      <span>/</span>
+      <a href="{% url 'produtos:catalogo' %}?categoria={{ produto.categoria.pk }}">{{ produto.categoria.nome }}</a>
+      {% endif %}
+      <span>/</span>
+      <span class="crumb-current">{{ produto.nome|truncatechars:30 }}</span>
+    </nav>
+
+    <div class="detalhe-grid">
+
+      <!-- Imagem -->
+      <div class="detalhe-img-col">
+        <div class="detalhe-img-card">
+          {% if produto.imagem_url %}
+          <img src="{{ produto.imagem_url }}" alt="{{ produto.nome }}" class="detalhe-img"
+               onerror="this.src='https://placehold.co/600x600/6c63ff/ffffff?text={{ produto.nome|slice:':2'|upper }}'">
+          {% else %}
+          <div class="detalhe-no-img">{{ produto.nome|slice:":2"|upper }}</div>
+          {% endif %}
+          {% if produto.tem_promocao %}
+          <div class="detalhe-sale-badge">-{{ produto.percentual_desconto }}% OFF</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="detalhe-info-col">
+        {% if produto.categoria %}
+        <p class="det-cat">{{ produto.categoria.nome }}</p>
+        {% endif %}
+        <h1 class="det-nome">{{ produto.nome }}</h1>
+
+        <div class="det-prices">
+          {% if produto.tem_promocao %}
+          <span class="det-price-old">R$ {{ produto.preco }}</span>
+          <span class="det-price-new">R$ {{ produto.preco_promocional }}</span>
+          <span class="det-economy">Você economiza {{ produto.percentual_desconto }}%</span>
+          {% else %}
+          <span class="det-price">R$ {{ produto.preco }}</span>
+          {% endif %}
+        </div>
+
+        <div class="det-stock-badge {% if produto.estoque == 0 %}esgotado{% endif %}">
+          {% if produto.estoque > 0 %}
+          ✔ {{ produto.estoque }} unidade{{ produto.estoque|pluralize:"s" }} em estoque
+          {% else %}
+          ✗ Produto esgotado
+          {% endif %}
+        </div>
+
+        <div class="det-desc">
+          <p class="det-desc-label">DESCRIÇÃO</p>
+          <p class="det-desc-text">{{ produto.descricao }}</p>
+        </div>
+
+        <div class="det-meta-row">
+          <span class="det-meta-item">Cód. #{{ produto.pk }}</span>
+          <span class="det-meta-dot">·</span>
+          <span class="det-meta-item">Adicionado {{ produto.criado_em|date:"d/m/Y" }}</span>
+          {% if produto.categoria %}
+          <span class="det-meta-dot">·</span>
+          <a href="{% url 'produtos:catalogo' %}?categoria={{ produto.categoria.pk }}" class="det-meta-link">{{ produto.categoria.nome }}</a>
+          {% endif %}
+        </div>
+
+        <a href="{% url 'produtos:catalogo' %}" class="btn-back-cat">← Voltar ao Catálogo</a>
+
+        {% if user.is_authenticated %}
+        <div class="det-admin-bar">
+          <span class="det-admin-label">⚙ Ações</span>
+          <a href="{% url 'produtos:editar' produto.pk %}" class="btn-sm-edit">Editar</a>
+          <a href="{% url 'produtos:excluir' produto.pk %}" class="btn-sm-del">Excluir</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Relacionados -->
+    {% if relacionados %}
+    <div class="relacionados-section">
+      <h2 class="section-title" style="margin-bottom:24px">DA MESMA CATEGORIA</h2>
+      <div class="produtos-grid">
+        {% for p in relacionados %}
+        <a href="{% url 'produtos:detalhe' p.pk %}" class="produto-card">
+          <div class="pc-img">
+            {% if p.imagem_url %}
+            <img src="{{ p.imagem_url }}" alt="{{ p.nome }}"
+                 onerror="this.src='https://placehold.co/400x400/6c63ff/ffffff?text={{ p.nome|slice:':2'|upper }}'">
+            {% else %}
+            <div class="pc-no-img">{{ p.nome|slice:":2"|upper }}</div>
+            {% endif %}
+            {% if p.tem_promocao %}<span class="badge-sale pc-badge">-{{ p.percentual_desconto }}%</span>{% endif %}
+          </div>
+          <div class="pc-info">
+            <p class="pc-name">{{ p.nome }}</p>
+            <div class="pc-prices">
+              {% if p.tem_promocao %}
+              <span class="price-old">R$ {{ p.preco }}</span>
+              <span class="price-new">R$ {{ p.preco_promocional }}</span>
+              {% else %}
+              <span class="price-main">R$ {{ p.preco }}</span>
+              {% endif %}
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

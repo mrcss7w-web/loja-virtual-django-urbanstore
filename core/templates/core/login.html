@@ -1,0 +1,29 @@
+{% extends 'core/base.html' %}
+{% block title %}Login — UrbanStore{% endblock %}
+{% block content %}
+<section class="login-section">
+    <div class="login-card">
+        <div class="login-header">
+            <span class="brand-mark lg">U</span>
+            <h1 class="login-title">Área Administrativa</h1>
+            <p class="login-sub">Faça login para gerenciar a loja</p>
+        </div>
+        <form method="post" class="login-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_username">Usuário</label>
+                <input type="text" name="username" id="id_username" class="form-input" placeholder="Seu usuário" autofocus required autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="id_password">Senha</label>
+                <input type="password" name="password" id="id_password" class="form-input" placeholder="Sua senha" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn-login">Entrar →</button>
+        </form>
+        <p style="text-align:center;margin-top:20px;font-size:12px;color:var(--text-muted)">
+            Usuário padrão: <code style="color:var(--accent)">admin</code> / <code style="color:var(--accent)">admin123</code>
+        </p>
+        <p class="login-back"><a href="{% url 'core:home' %}">← Voltar para a loja</a></p>
+    </div>
+</section>
+{% endblock %}
